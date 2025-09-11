@@ -11,13 +11,27 @@ interface CommentProps {
 }
 
 export const getData = async (url: string) => {
-	const res = await fetch(url, {
-		headers: {
-			'content-type': 'application/json',
-		},
-		method: 'GET',
-	});
-	const data: CommentProps[] = await res.json();
-	const result = data.map((item: CommentProps) => `ID: ${item.id}, Email: ${item.email}`);
-	return result.join('\n');
+	try {
+		const res = await fetch(url, {
+			headers: {
+				'content-type': 'application/json',
+			},
+			method: 'GET',
+		});
+
+		if (!res.ok) {
+			throw new Error(`Error! ${res.statusText}`);
+		}
+
+		const data: CommentProps[] = await res.json();
+
+		if (!Array.isArray(data)) {
+			throw new Error('Error! Data is not an array!');
+		}
+
+		const result = data.map((item) => `ID: ${item.id}, Email: ${item.email}`);
+		return result.join('\n');
+	} catch (error) {
+		console.error(error);
+	}
 };
